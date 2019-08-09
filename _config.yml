@@ -10,5 +10,19 @@ author: "Anon"
 header:
  title: "Darkweb Kittens"
 footer:
- name: "Pictures of kittens... on the dark web."
- bio: "Work in progress...<br>Please stand by."
+ left: 
+  title: "Putting the Cute Cat Theory into practice"
+  content: "
+   Welcome to Darkweb Kittens. As you may have guessed, this is a site about kittens. And it's on the 'dark web'.
+   <br><br>
+   The site's content is a reference to Ethan Zuckerman's <a href='https://en.wikipedia.org/wiki/Cute_cat_theory_of_digital_activism'>Cute Cat Theory</a> of digital activism. The theory suggests that when more people start using a particular service (in this case Tor Onion Services) for mundane activities like sharing pictures of kittens, rather than solely for activism or avoiding censorship, that service becomes more resistant to government interference or censorship.
+   "
+ right: 
+  title: "Visit this site"
+  content: "
+   This site is available as an onion service at
+   <br>
+   <center><b><i>kitten3wusb6j26ukqae5cioarrademwlaoa5sria4uporcstbkdflid.onion</b></i></center>
+   <br>
+   To view the 'dark web' version of this site on the Tor network, you will need to <a href='https://www.torproject.org'>download the Tor Browser</a> and use it to visit the <i>.onion</i> address shown above.
+   "

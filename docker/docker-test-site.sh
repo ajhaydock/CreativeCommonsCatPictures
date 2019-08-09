@@ -11,4 +11,4 @@ docker run --rm -it \
   -v "$(pwd)/../:/opt/www/" \
   -p "127.0.0.1:4000:4000/tcp" \
   darkwebkittens \
-    bundle exec jekyll serve --incremental -H 0.0.0.0
+     bundle exec jekyll serve -H 0.0.0.0
