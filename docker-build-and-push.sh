@@ -10,6 +10,10 @@ elif [ "$(uname -m | grep 'armv7l' | wc -l)" -gt 0 ]; then
     echo "This looks like an armv7l system. Building for that platform."
     docker build --no-cache -t registry.gitlab.com/alexhaydock/darkwebkittens.xyz:armv7l .
     docker push registry.gitlab.com/alexhaydock/darkwebkittens.xyz:armv7l
+elif [ "$(uname -m | grep 'aarch64' | wc -l)" -gt 0 ]; then
+    echo "This looks like an aarch64 system. Building for that platform."
+    docker build --no-cache -t registry.gitlab.com/alexhaydock/darkwebkittens.xyz:aarch64 .
+    docker push registry.gitlab.com/alexhaydock/darkwebkittens.xyz:aarch64
 else
     echo "Sorry, I don't understand this processor architecture."
     echo "Please build manually."
