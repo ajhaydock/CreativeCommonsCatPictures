@@ -1,7 +1,25 @@
-# Files
+# Don't pass the Ansible playbook into the Docker container
+# otherwise Jekyll actually tries to use it as config and
+# predictably gets rather confused.
+ansible-playbook.yml
+
+# Don't pass in some other random files
 README.md
 CNAME
 *.sh
+Makefile
+logo.jpg
 
-# Jekyll built dir
-_site
+# Don't pass in any Git stuff
+.git/
+.gitlab-ci.yml
+.gitignore
+
+# Don't pass in the Jekyll built dir if we have one
+# (we'll build one in the container anyway)
+_site/
+
+# Don't pass in Terraform files either
+*.tfstate
+.terraform/
+*.tf

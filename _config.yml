@@ -26,3 +26,20 @@ footer:
    <br>
    To view the 'dark web' version of this site on the Tor network, you will need to <a href='https://www.torproject.org'>download the Tor Browser</a> and use it to visit the <i>.onion</i> address shown above.
    "
+
+# Exclude files
+exclude:
+  - ".dockerigore"
+  - ".gitignore"
+  - ".gitlab-ci.yml"
+  - "ansible-playbook.yml"
+  - "terraform.tf"
+  - "terraform.tfstate"
+  - "terraform.tfstate.backup"
+  - ".terraform/"
+  - ".git/"
+  - "README.md"
+  - "logo.jpg"
+  - "LICENSE"
+  - "CNAME"
+  - "Makefile"

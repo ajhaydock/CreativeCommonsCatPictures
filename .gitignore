@@ -1,3 +1,6 @@
+# Jekyll build dir
+_site/
+
 # Terraform module directory
 .terraform/
 
