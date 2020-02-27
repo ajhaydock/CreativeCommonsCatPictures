@@ -3,6 +3,31 @@
   name: Configure Terraform Host
   gather_facts: true
 
+  pre_tasks:
+    # We need the Cloudflare API keys set in our env vars for this to work, so we will delegate this one task to localhost
+    - name: Destroy all previous A records for doh.darkwebkittens.xyz
+      cloudflare_dns:
+        zone: darkwebkittens.xyz
+        record: doh
+        type: A
+        state: absent
+        account_email: "{{ lookup('env','CLOUDFLARE_EMAIL') }}"
+        account_api_token: "{{ lookup('env','CLOUDFLARE_API_KEY') }}"
+      delegate_to: localhost
+
+    - name: Create a Cloudflare A record for doh.darkwebkittens.xyz with the IP of the AWS machine
+      cloudflare_dns:
+        zone: darkwebkittens.xyz
+        record: doh
+        type: A
+        # This shouldn't break as Terraform passes the raw IPv4 address of the EC2 instance when handing over to Ansible (not a FQDN/hostname).
+        value: '{{ inventory_hostname }}'
+        # Short TTL allows for experimentation
+        ttl: 300
+        account_email: "{{ lookup('env','CLOUDFLARE_EMAIL') }}"
+        account_api_token: "{{ lookup('env','CLOUDFLARE_API_KEY') }}"
+      delegate_to: localhost
+
   tasks:
     - name: Update Apt packages
       become: yes
@@ -36,23 +61,7 @@
           - docker-compose
         state: latest
 
-    - name: Pull site container
-      become: yes
-      docker_image:
-        name: registry.gitlab.com/alexhaydock/darkwebkittens.xyz
-        source: pull
-
-    - name: Start site container
-      become: yes
-      docker_container:
-        name: darkwebkittens.xyz
-        image: registry.gitlab.com/alexhaydock/darkwebkittens.xyz
-        state: started
-        restart: yes
-        ports:
-          - "80:80/tcp"
-
-    - name: Copy onion keys etc. to EC2 instance
+    - name: Copy onion keys and compose file etc. to EC2 instance
       copy:
         src: ~/.ssh/darkwebkittens/
         dest: /home/ubuntu/darkwebkittens/
@@ -81,8 +90,69 @@
         name: obfs4-bridge
         image: phwinter/obfs4-bridge
         state: started
-        restart: yes
         env: "OR_PORT=27015 PT_PORT=25565 EMAIL=alex@alexhaydock.co.uk"
+
+    - name: Create dir to hold acme.sh config
+      file:
+        path: /home/ubuntu/certs
+        state: directory
+
+    - name: Copy acme.sh config (incl. Cloudflare DNS API tokens) to server
+      copy:
+        src: ~/.ssh/acme_sh_account.conf
+        dest: /home/ubuntu/certs/account.conf
+
+    - name: Generate a cert for DoH resolver
+      become: yes
+      docker_container:
+        name: acme.sh
+        image: neilpang/acme.sh
+        state: started
+        auto_remove: yes
+        volumes:
+          - /home/ubuntu/certs:/acme.sh
+        command: "--issue --dns dns_cf -d doh.darkwebkittens.xyz"
+
+    - name: Create cronjob to run at 4 AM to renew cert
+      become: yes
+      cron:
+        name: "Renew cert"
+        minute: "0"
+        hour: "4"
+        job: 'docker run --rm -it -v "/home/ubuntu/certs":"/acme.sh" neilpang/acme.sh --cron'
+
+    # We'll probably also need a cronjob to run after that to reload the Nginx config to actually pick up the new cert if we have one
+
+    - name: Create dir for DoH compose file
+      file:
+        path: /home/ubuntu/doh
+        state: directory
+
+    - name: Copy DoH (Nginx DoH gateway --> Pi-Hole --> cloudflared) Docker Compose file
+      copy:
+        src: _doh/docker-compose.yml
+        dest: /home/ubuntu/doh/docker-compose.yml
+
+    - name: Copy nginx.conf
+      copy:
+        src: _doh/nginx.conf
+        dest: /home/ubuntu/doh/nginx.conf
+
+    - name: Git checkout the Nginx javascript code that translates DoH syntax into what we need (we refer to this in nginx.conf)
+      git:
+        repo: https://github.com/TuxInvader/nginx-dns.git
+        dest: /home/ubuntu/doh/nginx-dns
+        clone: yes
+
+    - name: Deploy the Nginx --> Pi-Hole --> cloudflared stack with Docker Compose
+      become: yes
+      docker_compose:
+        project_src: /home/ubuntu/doh/
+        build: yes
+        nocache: yes
+        recreate: always
+        restarted: yes
+        state: present
 
     - name: Read the obfs4 relay hash from the running container
       become: yes
@@ -94,11 +164,8 @@
       command: docker exec -i kittens-tor cat /opt/onion/hostname
       register: onion_hostname
 
-    - name: Get public IP for the AWS instance
-      ipify_facts:
-
     - debug:
-        msg: "✅ Your new instance is available at http://aws.darkwebkittens.xyz or http://{{ ipify_public_ip }}"
+        msg: "✅ Your new instance is available at http://aws.darkwebkittens.xyz or http://{{ inventory_hostname }}"
 
     - debug:
         msg: "🧅 The onion service should also be available at http://{{ onion_hostname.stdout }}"

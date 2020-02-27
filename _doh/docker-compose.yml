@@ -1,0 +1,75 @@
+version: "3"
+
+services:
+  cloudflared:
+    container_name: cloudflared
+    image: visibilityspots/cloudflared:latest
+    networks:
+      pihole_net:
+        ipv4_address: 10.0.0.2
+    restart: unless-stopped
+
+  pi-hole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    hostname: pihole
+    depends_on:
+      - cloudflared
+    expose:
+      # DNS
+      - "53/tcp"
+      - "53/udp"
+      # WebUI
+      - "80/tcp"
+      - "443/tcp"
+    environment:
+      TZ: 'Europe/London'
+      WEBPASSWORD: 'correct-horse-battery-staple'
+      DNS1: '10.0.0.2#5054'
+      DNS2: 'no'
+      # We don't want this since cloudflared handles DNSSEC further upstream.
+      DNSSEC: 'false'
+      DNSMASQ_LISTENING: 'all'
+      IPv6: 'false'
+      # The two ENV vars below are needed to stop the WebUI breaking when we use it on a port other than the default (:80)
+      VIRTUAL_HOST: '127.0.0.1:3141'
+      WEB_PORT: '3141'
+    networks:
+      pihole_net:
+        ipv4_address: 10.0.0.3
+    ports:
+      # Access Pi-Hole WebUI locally with: 'ssh ubuntu@doh.darkwebkittens.xyz -L 3141:127.0.0.1:3141'
+      - "127.0.0.1:3141:3141/tcp"
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+    volumes:
+       - '/home/ubuntu/pihole/etc-pihole/:/etc/pihole/'
+       - '/home/ubuntu/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/'
+    restart: unless-stopped
+
+  nginx-doh-public:
+    container_name: nginx-doh
+    hostname: doh.darkwebkittens.xyz
+    depends_on:
+      - cloudflared
+      - pi-hole
+    image: nginx:alpine
+    volumes:
+      - '/home/ubuntu/certs/:/certs/:ro'
+      - '/home/ubuntu/doh/nginx.conf:/etc/nginx/nginx.conf:ro'
+      # git clone https://github.com/TuxInvader/nginx-dns.git /home/ubuntu/doh/nginx-dns
+      - '/home/ubuntu/doh/nginx-dns/njs.d:/etc/nginx/njs.d:ro'
+    ports:
+      - "443:443/tcp"
+    networks:
+      pihole_net:
+        ipv4_address: 10.0.0.4
+    restart: unless-stopped
+
+networks:
+  pihole_net:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.0.0.0/29

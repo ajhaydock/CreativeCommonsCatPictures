@@ -17,6 +17,10 @@ This repo is the culmination of experimentation with lots of different tools and
 * **Terraform** - Automated infrastructure deployment.
 * **Ansible** - Configuration management of deployed infrastructure.
 * **AWS** - My current platform for testing infrastructure automation.
+* **DNS** - Cloudflare Managed DNS in particular, with automated management by both Terraform and Ansible.
+* **DNS-over-HTTPS** - This runs a public DoH resolver (for now; will remove if it gets abused).
+* **NGINX** - Used as a TLS 1.3 terminator for DoH, including some of the more complex config like `stream{}` blocks and JS modules.
+* **Pi-Hole** - Deployed via Docker for filtering on the DoH instance.
 
 ### Deployment:
 To quickly deploy a build version of this container, you can run a Docker command like this:
