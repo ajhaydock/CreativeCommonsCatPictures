@@ -38,7 +38,7 @@ services:
       pihole_net:
         ipv4_address: 10.0.0.3
     ports:
-      # Access Pi-Hole WebUI locally with: 'ssh ubuntu@doh.darkwebkittens.xyz -L 3141:127.0.0.1:3141'
+      # Access Pi-Hole WebUI locally with: 'ssh ubuntu@dns.darkwebkittens.xyz -L 3141:127.0.0.1:3141'
       - "127.0.0.1:3141:3141/tcp"
     dns:
       - 127.0.0.1
@@ -50,7 +50,7 @@ services:
 
   nginx-doh-public:
     container_name: nginx-doh
-    hostname: doh.darkwebkittens.xyz
+    hostname: dns.darkwebkittens.xyz
     depends_on:
       - cloudflared
       - pi-hole

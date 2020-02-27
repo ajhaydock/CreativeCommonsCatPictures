@@ -5,20 +5,20 @@
 
   pre_tasks:
     # We need the Cloudflare API keys set in our env vars for this to work, so we will delegate this one task to localhost
-    - name: Destroy all previous A records for doh.darkwebkittens.xyz
+    - name: Destroy all previous A records for dns.darkwebkittens.xyz
       cloudflare_dns:
         zone: darkwebkittens.xyz
-        record: doh
+        record: dns
         type: A
         state: absent
         account_email: "{{ lookup('env','CLOUDFLARE_EMAIL') }}"
         account_api_token: "{{ lookup('env','CLOUDFLARE_API_KEY') }}"
       delegate_to: localhost
 
-    - name: Create a Cloudflare A record for doh.darkwebkittens.xyz with the IP of the AWS machine
+    - name: Create a Cloudflare A record for dns.darkwebkittens.xyz with the IP of the AWS machine
       cloudflare_dns:
         zone: darkwebkittens.xyz
-        record: doh
+        record: dns
         type: A
         # This shouldn't break as Terraform passes the raw IPv4 address of the EC2 instance when handing over to Ansible (not a FQDN/hostname).
         value: '{{ inventory_hostname }}'
@@ -111,7 +111,7 @@
         auto_remove: yes
         volumes:
           - /home/ubuntu/certs:/acme.sh
-        command: "--issue --dns dns_cf -d doh.darkwebkittens.xyz"
+        command: "--issue --dns dns_cf -d dns.darkwebkittens.xyz"
 
     - name: Create cronjob to run at 4 AM to renew cert
       become: yes
@@ -165,7 +165,7 @@
       register: onion_hostname
 
     - debug:
-        msg: "✅ Your new instance is available at http://aws.darkwebkittens.xyz or http://{{ inventory_hostname }}"
+        msg: "✅ Your new DoH instance is available at https://dns.darkwebkittens.xyz/dns-query"
 
     - debug:
         msg: "🧅 The onion service should also be available at http://{{ onion_hostname.stdout }}"
