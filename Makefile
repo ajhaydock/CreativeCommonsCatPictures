@@ -1,3 +1,4 @@
+.PHONY = test build apply plan destroy
 ARCH := $(shell uname -m)
 
 # ifeq statements *must not be indented* in Makefile otherwise it all breaks
@@ -12,3 +13,15 @@ else
 	docker build --no-cache -t registry.gitlab.com/alexhaydock/darkwebkittens.xyz:${ARCH} .
 	docker push registry.gitlab.com/alexhaydock/darkwebkittens.xyz:${ARCH}
 endif
+
+# Lazy commands to pass the env vars we need to Terraform so we can add our current public IP to the AWS security group.
+# We just add the /32 to the end of the string here. It's lazy, sure but Terraform wants proper CIDR notation and this is
+# the easiest way I could think to do it.
+apply:
+	export TF_VAR_PUBIP="$(shell wget -qO- ifconfig.co)/32" && terraform apply
+
+plan:
+	export TF_VAR_PUBIP="$(shell wget -qO- ifconfig.co)/32" && terraform plan
+
+destroy:
+	export TF_VAR_PUBIP="$(shell wget -qO- ifconfig.co)/32" && terraform destroy

@@ -7,8 +7,10 @@ docker-build:
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
-    - docker build -t "${CI_REGISTRY_IMAGE}" .
+    # Tag it with :latest and also with :x86_64 so we can pull by arch.
+    - docker build -t "${CI_REGISTRY_IMAGE}:latest" -t "${CI_REGISTRY_IMAGE}:x86_64" .
   after_script:
+    # If we don't specify a tag, this should push all tags to the registry.
     - docker push "${CI_REGISTRY_IMAGE}"
   only:
     - master

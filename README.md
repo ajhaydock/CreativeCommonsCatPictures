@@ -8,22 +8,38 @@ I use this so that I have a domain where I can experiment with new things (autom
 
 If you're particularly interested, you can deploy your own version of this site by either building from this repo using the `Makefile`, or deploying the pre-built Docker container from GitLab's container registry.
 
-### Test Locally
+### Technologies Used
+This repo is the culmination of experimentation with lots of different tools and technologies:
+* **Jekyll / Ruby** - For building the static site.
+* **Tor Onion Services** - For hosting the 'Darkweb' portion of this project.
+* **Docker** - Site container.
+* **GitLab CI** - Automated container builds and testing.
+* **Terraform** - Automated infrastructure deployment.
+* **Ansible** - Configuration management of deployed infrastructure.
+* **AWS** - My current platform for testing infrastructure automation.
+
+### Deployment:
+To quickly deploy a build version of this container, you can run a Docker command like this:
+```sh
+docker run --rm -it -p "80:80/tcp" "registry.gitlab.com/alexhaydock/darkwebkittens.xyz:$(uname -m)"
+```
+
+This command will pull the relevant image depending on your architecture. Regular `x86_64` images are automatically built by GitLab CI, but I also periodically push manual `armv7l` and `aarch64` builds using some Raspberry Pi systems which I own.
+
+### Develop Locally
+This runs a container with Jekyll which will listen on `localhost:4000` and will update live as you change aspects of the site design.
 ```sh
 make test
 ```
 
 ### Build & Push to GitLab
+Largely for my own use, this will build a static version of the site with Jekyll, and push it to a GitLab container registry.
 ```sh
 make build
 ```
 
-### Deployment (x86_64):
-```sh
-docker run --rm -it -p "80:80/tcp" "registry.gitlab.com/alexhaydock/darkwebkittens.xyz"
-```
-
-### Deployment (armv7l / aarch64)
-```sh
-docker run --rm -it -p "80:80/tcp" "registry.gitlab.com/alexhaydock/darkwebkittens.xyz:$(uname -m)"
-```
+### Running Terraform Plan
+Again, for my own use, I use a `Makefile` to make my life easier so I can pass the relevant environment variables to Terraform.
+* `terraform plan` --> BECOMES --> `make plan`
+* `terraform apply` --> BECOMES --> `make apply`
+* `terraform destroy` --> BECOMES --> `make destroy`
