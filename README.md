@@ -47,3 +47,6 @@ Again, for my own use, I use a `Makefile` to make my life easier so I can pass t
 * `terraform plan` --> BECOMES --> `make plan`
 * `terraform apply` --> BECOMES --> `make apply`
 * `terraform destroy` --> BECOMES --> `make destroy`
+
+### Updating AWS Security Groups
+If your public IP changes, or you move networks and you need to allow SSH access into the EC2 instance from your current IP, you can just run `make apply` again to update the security group without destroying the EC2 instance.

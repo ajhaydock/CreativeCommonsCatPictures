@@ -5,12 +5,16 @@ services:
     container_name: cloudflared
     image: registry.gitlab.com/alexhaydock/dockerfiles/cloudflared:latest
     hostname: cloudflared.darkwebkittens.xyz
+    expose:
+      # DNS
+      - "5054/tcp"
+      - "5054/udp"
+    restart: unless-stopped
     networks:
       pihole_net:
         ipv4_address: 10.0.0.2
-    restart: unless-stopped
 
-  pi-hole:
+  pihole:
     image: pihole/pihole:latest
     container_name: pihole
     hostname: pihole.darkwebkittens.xyz
@@ -23,6 +27,9 @@ services:
       # WebUI
       - "80/tcp"
       - "443/tcp"
+    ports:
+      # Access Pi-Hole WebUI locally with: 'ssh ubuntu@dns.darkwebkittens.xyz -L 3141:127.0.0.1:3141'
+      - "127.0.0.1:3141:3141/tcp"
     environment:
       TZ: 'Europe/London'
       WEBPASSWORD: 'correct-horse-battery-staple'
@@ -35,12 +42,6 @@ services:
       # The two ENV vars below are needed to stop the WebUI breaking when we use it on a port other than the default (:80)
       VIRTUAL_HOST: '127.0.0.1:3141'
       WEB_PORT: '3141'
-    networks:
-      pihole_net:
-        ipv4_address: 10.0.0.3
-    ports:
-      # Access Pi-Hole WebUI locally with: 'ssh ubuntu@dns.darkwebkittens.xyz -L 3141:127.0.0.1:3141'
-      - "127.0.0.1:3141:3141/tcp"
     dns:
       - 127.0.0.1
       - 1.1.1.1
@@ -48,6 +49,9 @@ services:
        - '/home/ubuntu/pihole/etc-pihole/:/etc/pihole/'
        - '/home/ubuntu/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/'
     restart: unless-stopped
+    networks:
+      pihole_net:
+        ipv4_address: 10.0.0.3
 
   nginx-doh-public:
     image: nginx:stable-alpine
@@ -55,7 +59,7 @@ services:
     hostname: dns.darkwebkittens.xyz
     depends_on:
       - cloudflared
-      - pi-hole
+      - pihole
     volumes:
       - '/home/ubuntu/certs/:/certs/:ro'
       - '/home/ubuntu/doh/nginx-public-resolver.conf:/etc/nginx/nginx.conf:ro'
@@ -63,10 +67,10 @@ services:
       - '/home/ubuntu/doh/nginx-dns/njs.d:/etc/nginx/njs.d:ro'
     ports:
       - "443:443/tcp"
+    restart: unless-stopped
     networks:
       pihole_net:
         ipv4_address: 10.0.0.4
-    restart: unless-stopped
 
 networks:
   pihole_net:

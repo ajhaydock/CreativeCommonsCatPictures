@@ -49,9 +49,17 @@ resource "aws_security_group" "securitygroup" {
   }
 
   ingress {
-    # Allow HTTPS (but we're not doing HTTP!) in from anywhere
+    # Allow HTTPS for DoH (we're not even bothering with opening HTTP ports) in from anywhere
     from_port   = 443
     to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    # Allow DoT in from anywhere
+    from_port   = 853
+    to_port     = 853
     protocol    = "tcp"
     cidr_blocks     = ["0.0.0.0/0"]
   }
