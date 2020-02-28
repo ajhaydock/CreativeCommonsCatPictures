@@ -135,8 +135,8 @@
 
     - name: Copy nginx.conf
       copy:
-        src: _doh/nginx.conf
-        dest: /home/ubuntu/doh/nginx.conf
+        src: _doh/nginx-public-resolver.conf
+        dest: /home/ubuntu/doh/nginx-public-resolver.conf
 
     - name: Git checkout the Nginx javascript code that translates DoH syntax into what we need (we refer to this in nginx.conf)
       git:
