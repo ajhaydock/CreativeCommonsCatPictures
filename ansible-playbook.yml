@@ -144,6 +144,16 @@
         dest: /home/ubuntu/doh/nginx-dns
         clone: yes
 
+    - name: Create dir for Pi-Hole
+      file:
+        path: /home/ubuntu/pihole/etc-pihole
+        state: directory
+
+    - name: Copy my custom Pi-Hole ad list config (the default lists, plus some lists of my own)
+      copy:
+        src: _doh/adlists.list
+        dest: /home/ubuntu/pihole/etc-pihole/adlists.list
+
     - name: Deploy the Nginx --> Pi-Hole --> cloudflared stack with Docker Compose
       become: yes
       docker_compose:
