@@ -1,9 +1,13 @@
-FROM debian:latest as builder
+FROM ubuntu:20.04 as builder
 LABEL maintainer "Alex Haydock <alex@alexhaydock.co.uk>"
+
+ENV DEBIAN_FRONTEND noninteractive
 
 # Set locale to solve 'US-ASCII' issue
 # https://github.com/jekyll/jekyll/issues/4268#issuecomment-167258562
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y locales
+RUN apt-get update && \
+    apt-get install -y \
+      locales
 
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     dpkg-reconfigure --frontend=noninteractive locales && \
