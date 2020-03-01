@@ -8,3 +8,6 @@ _site/
 *.tfstate
 *.tfstate.backup
 *.lock.info
+
+# Don't use Gemfile.lock
+Gemfile.lock
