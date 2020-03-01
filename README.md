@@ -1,5 +1,7 @@
 # darkwebkittens.xyz
 
+[![pipeline status](https://gitlab.com/alexhaydock/darkwebkittens.xyz/badges/master/pipeline.svg)](https://gitlab.com/alexhaydock/darkwebkittens.xyz/-/commits/master)
+
 http://kitten3wusb6j26ukqae5cioarrademwlaoa5sria4uporcstbkdflid.onion
 
 This domain and site are a tongue-in-cheek reference to Ethan Zuckerman's [Cute Cat Theory](https://en.wikipedia.org/wiki/Cute_cat_theory_of_digital_activism) of digital activism. The theory suggests that when more people start using a particular service (in this case Tor Onion Services) for mundane activities like sharing pictures of kittens, rather than solely for activism or avoiding censorship, that service becomes more resistant to government interference or censorship.
