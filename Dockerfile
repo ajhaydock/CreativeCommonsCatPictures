@@ -26,7 +26,8 @@ RUN apt-get install -y \
 COPY . /tmp/darkwebkittens.xyz
 WORKDIR /tmp/darkwebkittens.xyz
 
-# Update RubyGems to solve SSL cert error on some architectures
+# Add cert and update RubyGems to solve SSL cert error on some architectures
+ADD https://raw.githubusercontent.com/rubygems/rubygems/master/lib/rubygems/ssl_certs/index.rubygems.org/GlobalSignRootCA.pem /usr/local/ssl/cert.pem
 RUN gem update --system
 
 # Install the relevant gems with Bundler and then build the site
