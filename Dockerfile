@@ -1,4 +1,4 @@
-FROM debian as builder
+FROM debian:latest as builder
 LABEL maintainer "Alex Haydock <alex@alexhaydock.co.uk>"
 
 # Set locale to solve 'US-ASCII' issue
@@ -21,6 +21,9 @@ RUN apt-get install -y \
 # Copy site content into container
 COPY . /tmp/darkwebkittens.xyz
 WORKDIR /tmp/darkwebkittens.xyz
+
+# Update RubyGems to solve SSL cert error on some architectures
+RUN gem update --system
 
 # Install the relevant gems with Bundler and then build the site
 RUN bundle install
