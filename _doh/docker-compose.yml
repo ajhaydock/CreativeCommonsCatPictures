@@ -1,14 +1,15 @@
 version: "3"
 
 services:
+  # I'll switch this out for dnsproxy once it does DNSSEC properly
   cloudflared:
     container_name: cloudflared
     image: registry.gitlab.com/alexhaydock/dockerfiles/cloudflared:latest
     hostname: cloudflared.darkwebkittens.xyz
     expose:
       # DNS
-      - "5054/tcp"
-      - "5054/udp"
+      - "5053/tcp"
+      - "5053/udp"
     restart: unless-stopped
     networks:
       pihole_net:
@@ -33,7 +34,7 @@ services:
     environment:
       TZ: 'Europe/London'
       WEBPASSWORD: 'correct-horse-battery-staple'
-      DNS1: '10.0.0.2#5054'
+      DNS1: '10.0.0.2#5053'
       DNS2: 'no'
       # We don't want this since cloudflared handles DNSSEC further upstream.
       DNSSEC: 'false'
