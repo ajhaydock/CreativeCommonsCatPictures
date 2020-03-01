@@ -25,10 +25,10 @@ This repo is the culmination of experimentation with lots of different tools and
 ### Deployment:
 To quickly deploy a build version of this container, you can run a Docker command like this:
 ```sh
-docker run --rm -it -p "80:80/tcp" "registry.gitlab.com/alexhaydock/darkwebkittens.xyz:$(uname -m)"
+docker run --rm -it -p "80:80/tcp" "registry.gitlab.com/alexhaydock/darkwebkittens.xyz"
 ```
 
-This command will pull the relevant image depending on your architecture. Regular `x86_64` images are automatically built by GitLab CI, but I also periodically push manual `armv7l` and `aarch64` builds using some Raspberry Pi systems which I own.
+This command will pull the relevant image depending on your architecture. Regular `amd64`, `armv7`, and `arm64` images are automatically built by GitLab CI.
 
 ### Develop Locally
 This runs a container with Jekyll which will listen on `localhost:4000` and will update live as you change aspects of the site design.
