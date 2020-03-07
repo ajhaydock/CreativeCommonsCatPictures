@@ -1,6 +1,6 @@
 ---
 - hosts: all
-  name: Configure Terraform Host
+  name: Configure Deployed Terraform Host with Ansible
   gather_facts: true
 
   pre_tasks:
@@ -130,12 +130,12 @@
 
     - name: Copy DoH (Nginx DoH gateway --> Pi-Hole --> cloudflared) Docker Compose file
       copy:
-        src: _doh/docker-compose.yml
+        src: docker-compose.yml
         dest: /home/ubuntu/doh/docker-compose.yml
 
     - name: Copy nginx.conf
       copy:
-        src: _doh/nginx-public-resolver.conf
+        src: nginx-public-resolver.conf
         dest: /home/ubuntu/doh/nginx-public-resolver.conf
 
     - name: Git checkout the Nginx javascript code that translates DoH syntax into what we need (we refer to this in nginx.conf)
@@ -151,7 +151,7 @@
 
     - name: Copy my custom Pi-Hole ad list config (the default lists, plus some lists of my own)
       copy:
-        src: _doh/adlists.list
+        src: adlists.list
         dest: /home/ubuntu/pihole/etc-pihole/adlists.list
 
     - name: Deploy the Nginx --> Pi-Hole --> cloudflared stack with Docker Compose
