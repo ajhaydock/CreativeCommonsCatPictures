@@ -17,7 +17,7 @@ variable "security_group_name" {
 # Associate pubkey with AWS account (currently just using ~/.ssh/id_ed25519)
 resource "aws_key_pair" "keypair" {
   key_name   = "terraform-key"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDQ8nVu4khdWvAQjmpMXhTqBUaxOd2mItwJQl+slJnMYEJ7agCg8DsAhAsRaCeMplPDadkZaRtd9V5kUZYfeH5+zMpTuhubPjcd3u2UM5hRIkhxuoQU/P9g70KpfePinhukX9GUa4wip6RapZhHDWJeTuAErbvsHj+7dLVDc9o8B+Wyjn1P1Inm7Tmd8odfDdbtb2WQhJUvRAlWxsuvwfxX7Q5BwgQKrjNuuU6NufZn2sb3SHL80fOWzWGDH4uKG6rKN7OVbKcWIOyAmhoMmLNMSyrRrb8W0/1BFRgwR3f4V91Oej4JGf0hIoDhWLlT50gD+6CRWjgP2FhC1I8W8gWVBOVlFEmGaa+hSGOiqccVXGPTEoZCrsJRb9qABPM2ZDTLov4LTUvoq0BoUgAcd2Xsv9ZnOeHPFojKAbNGX8AsBVXXaiaMmw9GUdsd+oJG0v/neWwrzml0BeOuXoRQqG3bAaFbgzz6aOdg+y1w5tMeerPmPKsSTSS/uDTy2hKXnKPvOlYtTPS5cBnTwGKQLzJRdoLxo7SoUHZ0z1+r7QB7fwnJLT1d+AuCm9/KRo+tvxkxiguCZcA8fEuY7+od6/93mn7LeUDT33SNplk9xqxG938DoUvEeep0aOz6i34LwpB90Ttl8uA258mbhuJZu7h1nEfUy08l+F1yDkhQcnz2uQ== null@null"
+  public_key = file(var.SSHPUBKEY)
 }
 
 # Look up the AMI ID of the Ubuntu instance we want

@@ -4,29 +4,29 @@
   gather_facts: true
 
   pre_tasks:
-    # We need the Cloudflare API keys set in our env vars for this to work, so we will delegate this one task to localhost
-    - name: Destroy all previous A records for dns.darkwebkittens.xyz
-      cloudflare_dns:
-        zone: darkwebkittens.xyz
-        record: dns
-        type: A
-        state: absent
-        account_email: "{{ lookup('env','CLOUDFLARE_EMAIL') }}"
-        account_api_token: "{{ lookup('env','CLOUDFLARE_API_KEY') }}"
-      delegate_to: localhost
-
-    - name: Create a Cloudflare A record for dns.darkwebkittens.xyz with the IP of the AWS machine
-      cloudflare_dns:
-        zone: darkwebkittens.xyz
-        record: dns
-        type: A
-        # This shouldn't break as Terraform passes the raw IPv4 address of the EC2 instance when handing over to Ansible (not a FQDN/hostname).
-        value: '{{ inventory_hostname }}'
-        # Short TTL allows for experimentation
-        ttl: 300
-        account_email: "{{ lookup('env','CLOUDFLARE_EMAIL') }}"
-        account_api_token: "{{ lookup('env','CLOUDFLARE_API_KEY') }}"
-      delegate_to: localhost
+#    # We need the Cloudflare API keys set in our env vars for this to work, so we will delegate this one task to localhost
+#    - name: Destroy all previous A records for dns.darkwebkittens.xyz
+#      cloudflare_dns:
+#        zone: darkwebkittens.xyz
+#        record: dns
+#        type: A
+#        state: absent
+#        account_email: "{{ lookup('env','CLOUDFLARE_EMAIL') }}"
+#        account_api_token: "{{ lookup('env','CLOUDFLARE_API_KEY') }}"
+#      delegate_to: localhost
+#
+#    - name: Create a Cloudflare A record for dns.darkwebkittens.xyz with the IP of the AWS machine
+#      cloudflare_dns:
+#        zone: darkwebkittens.xyz
+#        record: dns
+#        type: A
+#        # This shouldn't break as Terraform passes the raw IPv4 address of the EC2 instance when handing over to Ansible (not a FQDN/hostname).
+#        value: '{{ inventory_hostname }}'
+#        # Short TTL allows for experimentation
+#        ttl: 300
+#        account_email: "{{ lookup('env','CLOUDFLARE_EMAIL') }}"
+#        account_api_token: "{{ lookup('env','CLOUDFLARE_API_KEY') }}"
+#      delegate_to: localhost
 
   tasks:
     - name: Update Apt packages
