@@ -66,7 +66,7 @@
     auto_remove: yes
     volumes:
       - /home/ubuntu/certs:/acme.sh
-    command: "--issue --dns dns_cf -d dns.darkwebkittens.xyz"
+    command: "--issue --dns dns_cf -d wg.darkwebkittens.xyz"
 
 - name: Create a root cronjob to run at 4 AM to renew cert
   become: yes
@@ -105,12 +105,12 @@
 - name: Copy nginx.conf
   copy:
     src: nginx-public-resolver.conf
-    dest: /home/ubuntu/doh/nginx-public-resolver.conf
+    dest: /home/ubuntu/compose/nginx-public-resolver.conf
 
 - name: Git checkout the Nginx javascript code that translates DoH syntax into what we need (we refer to this in nginx.conf)
   git:
     repo: https://github.com/TuxInvader/nginx-dns.git
-    dest: /home/ubuntu/doh/nginx-dns
+    dest: /home/ubuntu/compose/nginx-dns
     clone: yes
 
 ### DEPLOY

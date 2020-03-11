@@ -21,12 +21,13 @@ services:
     hostname: pihole.darkwebkittens.xyz
     depends_on:
       - cloudflared
+    ports:
       # Listen globally for DNS queries
       # This makes it easier for us to deal with VPN setup, rather than listening on 127.0.0.1 which doesn't work
       # Obvious caveat is that we need to actually firewall this port, but I'm letting Amazon Security Groups handle that
       - "0.0.0.0:53:53/tcp"
       - "0.0.0.0:53:53/udp"
-      # Access Pi-Hole WebUI locally with: 'ssh ubuntu@dns.darkwebkittens.xyz -L 3141:127.0.0.1:3141'
+      # Access Pi-Hole WebUI locally with: 'ssh ubuntu@wg.darkwebkittens.xyz -L 3141:127.0.0.1:3141'
       - "127.0.0.1:3141:3141/tcp"
     environment:
       TZ: 'Europe/London'
@@ -54,15 +55,15 @@ services:
   nginx-doh-public:
     image: nginx:stable-alpine
     container_name: nginx-doh
-    hostname: dns.darkwebkittens.xyz
+    hostname: wg.darkwebkittens.xyz
     depends_on:
       - cloudflared
       - pihole
     volumes:
       - '/home/ubuntu/certs/:/certs/:ro'
-      - '/home/ubuntu/doh/nginx-public-resolver.conf:/etc/nginx/nginx.conf:ro'
-      # git clone https://github.com/TuxInvader/nginx-dns.git /home/ubuntu/doh/nginx-dns
-      - '/home/ubuntu/doh/nginx-dns/njs.d:/etc/nginx/njs.d:ro'
+      - '/home/ubuntu/compose/nginx-public-resolver.conf:/etc/nginx/nginx.conf:ro'
+      # git clone https://github.com/TuxInvader/nginx-dns.git /home/ubuntu/compose/nginx-dns
+      - '/home/ubuntu/compose/nginx-dns/njs.d:/etc/nginx/njs.d:ro'
     ports:
       - "0.0.0.0:443:443/tcp"
     restart: unless-stopped

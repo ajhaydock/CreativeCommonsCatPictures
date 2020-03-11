@@ -18,11 +18,14 @@ This repo is the culmination of experimentation with lots of different tools and
 * **GitLab CI** - Automated container builds and testing.
 * **Terraform** - Automated infrastructure deployment.
 * **Ansible** - Configuration management of deployed infrastructure.
-* **AWS** - My current platform for testing infrastructure automation.
+* **AWS EC2** - My current platform for testing infrastructure automation.
+* **AWS Security Groups** - Amazon's cloud firewall.
 * **DNS** - Cloudflare Managed DNS in particular, with automated management by both Terraform and Ansible.
 * **DNS-over-HTTPS** - This runs a public DoH resolver (for now; will remove if it gets abused).
 * **NGINX** - Used as a TLS 1.3 terminator for DoH, including some of the more complex config like `stream{}` blocks and JS modules.
 * **Pi-Hole** - Deployed via Docker for filtering on the DoH instance.
+* **WireGuard** - Runs a WireGuard VPN.
+* **iptables** - Configuring the WireGuard VPN config, particularly DNS.
 
 ### Deployment:
 To quickly deploy a build version of this container, you can run a Docker command like this:
@@ -52,3 +55,8 @@ Again, for my own use, I use a `Makefile` to make my life easier so I can pass t
 
 ### Updating AWS Security Groups
 If your public IP changes, or you move networks and you need to allow SSH access into the EC2 instance from your current IP, you can just run `make apply` again to update the security group without destroying the EC2 instance.
+
+### TODO
+* IPv6:
+  * Assign IPv6 address to server with the AWS resource in Terraform
+  * Set AAAA records properly with the Cloudflare resource in Terraform

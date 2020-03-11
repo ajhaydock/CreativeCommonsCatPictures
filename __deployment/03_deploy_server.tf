@@ -1,3 +1,6 @@
+# Import the $TF_VAR_SSHKEY shell variable so we can use it to find our SSH key below
+variable "SSHKEY" {}
+
 # Look up the AMI ID of the Ubuntu instance we want
 data "aws_ami" "ubuntu" {
   most_recent = true
@@ -28,7 +31,6 @@ resource "aws_instance" "dwk" {
         Name = "dwk"
     }
     security_groups = [var.security_group_name]
-    ipv6_address_count = 1
 
     # Use remote-exec to run a pointless command on the remote server because remote-exec will wait for the
     # server instance to deploy properly, whereas local-exec wouldn't. If we just try to run our Ansible

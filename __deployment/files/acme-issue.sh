@@ -9,4 +9,4 @@
 sudo docker run --rm -it \
   -v "/home/ubuntu/certs":"/acme.sh" \
   --name=acme.sh \
-  neilpang/acme.sh --issue --dns dns_cf -d dns.darkwebkittens.xyz
+  neilpang/acme.sh --issue --dns dns_cf -d wg.darkwebkittens.xyz
