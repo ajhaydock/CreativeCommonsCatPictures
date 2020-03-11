@@ -21,14 +21,11 @@ services:
     hostname: pihole.darkwebkittens.xyz
     depends_on:
       - cloudflared
-    expose:
-      # DNS
-      - "53/tcp"
-      - "53/udp"
-      # WebUI
-      - "80/tcp"
-      - "443/tcp"
-    ports:
+      # Listen globally for DNS queries
+      # This makes it easier for us to deal with VPN setup, rather than listening on 127.0.0.1 which doesn't work
+      # Obvious caveat is that we need to actually firewall this port, but I'm letting Amazon Security Groups handle that
+      - "0.0.0.0:53:53/tcp"
+      - "0.0.0.0:53:53/udp"
       # Access Pi-Hole WebUI locally with: 'ssh ubuntu@dns.darkwebkittens.xyz -L 3141:127.0.0.1:3141'
       - "127.0.0.1:3141:3141/tcp"
     environment:
@@ -67,7 +64,7 @@ services:
       # git clone https://github.com/TuxInvader/nginx-dns.git /home/ubuntu/doh/nginx-dns
       - '/home/ubuntu/doh/nginx-dns/njs.d:/etc/nginx/njs.d:ro'
     ports:
-      - "443:443/tcp"
+      - "0.0.0.0:443:443/tcp"
     restart: unless-stopped
     networks:
       pihole_net:

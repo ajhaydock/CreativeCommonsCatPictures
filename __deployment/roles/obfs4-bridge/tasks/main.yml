@@ -1,0 +1,17 @@
+---
+- name: Pull obfs4-bridge container
+  become: yes
+  docker_image:
+    name: phwinter/obfs4-bridge
+    source: pull
+
+# For obfs4 I'm currently using the default ports for Steam and Minecraft.
+# On AWS this might let us blend in a bit.
+- name: Start obfs4-bridge container
+  become: yes
+  docker_container:
+    name: obfs4-bridge
+    image: phwinter/obfs4-bridge
+    state: started
+    env: "OR_PORT=27015 PT_PORT=25565 EMAIL=alex@alexhaydock.co.uk"
+...

@@ -1,0 +1,126 @@
+---
+### PREREQS
+- name: Install Docker & Pip (via Apt)
+  become: yes
+  apt:
+    name:
+      - 'docker.io'
+      - 'python3-pip'
+    state: present
+
+- name: Install Docker Python API and Docker Compose (via Pip)
+  become: yes
+  pip:
+    name:
+      - docker
+      - docker-compose
+    state: latest
+
+### CONFIG SYSTEM DNS
+- name: Edit resolved.conf to disable the systemd-resolved stub resolver
+  become: yes
+  lineinfile:
+    path: /etc/systemd/resolved.conf
+    regexp: '#?DNSStubListener=yes'
+    line: DNSStubListener=no
+
+- name: Remove the old /etc/resolv.conf symlink
+  become: yes
+  file:
+    path: /etc/resolv.conf
+    state: absent
+
+- name: Symlink /etc/resolv.conf to the right config now that we've disabled the stub resolver
+  become: yes
+  file:
+    src: /run/systemd/resolve/resolv.conf
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    state: link
+
+- name: Restart systemd-resolved (and issue daemon-reload to pick up config changes)
+  become: yes
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: systemd-resolved
+
+### DoH TLS CERT
+- name: Create dir to hold acme.sh config
+  file:
+    path: /home/ubuntu/certs
+    state: directory
+
+- name: Copy acme.sh config (incl. Cloudflare DNS API tokens) to server
+  copy:
+    src: ~/.ssh/acme_sh_account.conf
+    dest: /home/ubuntu/certs/account.conf
+
+- name: Generate a cert for DoH resolver
+  become: yes
+  docker_container:
+    name: acme.sh
+    image: neilpang/acme.sh
+    state: started
+    auto_remove: yes
+    volumes:
+      - /home/ubuntu/certs:/acme.sh
+    command: "--issue --dns dns_cf -d dns.darkwebkittens.xyz"
+
+- name: Create a root cronjob to run at 4 AM to renew cert
+  become: yes
+  cron:
+    name: "Renew cert"
+    minute: "0"
+    hour: "4"
+    job: 'docker run --rm -it -v "/home/ubuntu/certs":"/acme.sh" neilpang/acme.sh --cron'
+
+# We'll probably also need a cronjob to run after that to reload the Nginx config to actually pick up the new cert if we have one
+
+### DOCKER COMPOSE CONFIG
+- name: Create dir for Pi-Hole compose file
+  file:
+    path: /home/ubuntu/compose
+    state: directory
+
+- name: Copy DoH + Pi-Hole (NGINX --> Pi-Hole --> cloudflared) compose file
+  copy:
+    src: docker-compose.yml
+    dest: /home/ubuntu/compose/docker-compose.yml
+
+- name: Create dir for Pi-Hole config
+  file:
+    path: /home/ubuntu/pihole/etc-pihole
+    state: directory
+
+- name: Copy my custom Pi-Hole blocklists
+  copy:
+    src: "{{ item }}"
+    dest: "/home/ubuntu/pihole/etc-pihole/{{ item }}"
+  with_items:
+    - adlists.list
+    - regex.list
+
+- name: Copy nginx.conf
+  copy:
+    src: nginx-public-resolver.conf
+    dest: /home/ubuntu/doh/nginx-public-resolver.conf
+
+- name: Git checkout the Nginx javascript code that translates DoH syntax into what we need (we refer to this in nginx.conf)
+  git:
+    repo: https://github.com/TuxInvader/nginx-dns.git
+    dest: /home/ubuntu/doh/nginx-dns
+    clone: yes
+
+### DEPLOY
+- name: Deploy the Pi-Hole --> cloudflared stack with Docker Compose
+  become: yes
+  docker_compose:
+    project_src: /home/ubuntu/compose/
+    build: yes
+    nocache: yes
+    recreate: always
+    restarted: yes
+    state: present
+...

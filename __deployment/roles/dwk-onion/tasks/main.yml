@@ -1,0 +1,16 @@
+---
+- name: Copy onion keys and compose file etc. to EC2 instance
+  copy:
+    src: ~/.ssh/darkwebkittens/
+    dest: /home/ubuntu/darkwebkittens/
+
+- name: Deploy onion service
+  become: yes
+  docker_compose:
+    project_src: /home/ubuntu/darkwebkittens/
+    build: yes
+    nocache: yes
+    recreate: always
+    restarted: yes
+    state: present
+...

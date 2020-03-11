@@ -1,0 +1,11 @@
+---
+- name: wg show
+  shell: wg show
+  register: wg_show
+- debug: msg="{{ wg_show.stdout_lines|list }}"
+
+- name: ip link show wg0
+  shell: ip link show wg0
+  register: iplink_wg
+- debug: msg="{{ iplink_wg.stdout_lines|list }}"
+...

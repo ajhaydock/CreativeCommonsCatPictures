@@ -6,10 +6,10 @@
 #
 # We use curl -4 now to force IPv4 so that we don't get an IPv6 address returned here.
 apply:
-	export TF_VAR_PUBIP="$(shell curl -4 --silent ifconfig.co)/32" && export TF_VAR_SSHKEY="/home/a/.ssh/id_RSA_AWS" && export TF_VAR_SSHPUBKEY="/home/a/.ssh/id_RSA_AWS.pub" && terraform apply
+	export TF_VAR_PUBIP="$(shell curl -4 --silent ifconfig.co)/32" && export TF_VAR_SSHKEY="/home/a/.ssh/id_rsa_AWS" && export TF_VAR_SSHPUBKEY="/home/a/.ssh/id_rsa_AWS.pub" && terraform apply
 
 plan:
-	export TF_VAR_PUBIP="$(shell curl -4 --silent ifconfig.co)/32" && export TF_VAR_SSHKEY="/home/a/.ssh/id_RSA_AWS" && export TF_VAR_SSHPUBKEY="/home/a/.ssh/id_RSA_AWS.pub" && terraform plan
+	export TF_VAR_PUBIP="$(shell curl -4 --silent ifconfig.co)/32" && export TF_VAR_SSHKEY="/home/a/.ssh/id_rsa_AWS" && export TF_VAR_SSHPUBKEY="/home/a/.ssh/id_rsa_AWS.pub" && terraform plan
 
 destroy:
-	export TF_VAR_PUBIP="$(shell curl -4 --silent ifconfig.co)/32" && export TF_VAR_SSHKEY="/home/a/.ssh/id_RSA_AWS" && export TF_VAR_SSHPUBKEY="/home/a/.ssh/id_RSA_AWS.pub" && terraform destroy
+	export TF_VAR_PUBIP="$(shell curl -4 --silent ifconfig.co)/32" && export TF_VAR_SSHKEY="/home/a/.ssh/id_rsa_AWS" && export TF_VAR_SSHPUBKEY="/home/a/.ssh/id_rsa_AWS.pub" && terraform destroy

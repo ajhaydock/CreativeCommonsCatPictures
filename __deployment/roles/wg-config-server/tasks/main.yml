@@ -1,0 +1,64 @@
+---
+- name: Create directory to hold keys
+  file:
+    path: /home/ubuntu/wg-keys
+    state: directory
+
+- name: Generate a pair of server keys with WG
+  shell: wg genkey | tee /home/ubuntu/wg-keys/server-priv | wg pubkey > /home/ubuntu/wg-keys/server-pub
+  args:
+    creates: /home/ubuntu/wg-keys/server-priv
+
+- name: Generate a pair of client keys with WG (we can always generate more later for other clients)
+  shell: wg genkey | tee /home/ubuntu/wg-keys/client-priv | wg pubkey > /home/ubuntu/wg-keys/client-pub
+  args:
+    creates: /home/ubuntu/wg-keys/client-priv
+
+- name: Create directory to hold keys (on local machine)
+  file:
+    path: ~/wg-config
+    state: directory
+  delegate_to: localhost
+
+- name: Copy generated server keys to local machine
+  fetch:
+    src: "/home/ubuntu/wg-keys/{{ item }}"
+    dest: "~/wg-config/{{ item }}"
+    flat: yes
+  with_items:
+    - server-priv
+    - server-pub
+    - client-priv
+    - client-pub
+
+- name: Add WG config to server
+  become: yes
+  template:
+    src: wg0-server.conf
+    dest: /etc/wireguard/wg0.conf
+
+- name: Enable IPv4 forwarding
+  become: yes
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Enable IPv6 forwarding
+  become: yes
+  sysctl:
+    name: net.ipv6.conf.all.forwarding
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Enable and start WireGuard on server
+  become: yes
+  systemd:
+    name: wg-quick@wg0
+    state: started
+    enabled: yes
+...
