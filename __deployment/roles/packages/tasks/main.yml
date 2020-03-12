@@ -8,7 +8,7 @@
 
 - name: Reboot if kernel/libs updated and reboot is requested by the system
   become: yes
-  shell: /sbin/shutdown -r now 'Rebooting box to update system libs/kernel as needed' 
+  shell: /sbin/shutdown -r now 'Rebooting box to update system libs/kernel as needed'
   args:
     removes: /var/run/reboot-required
   async: 300
