@@ -5,12 +5,12 @@
     state: directory
 
 - name: Generate a pair of server keys with WG
-  shell: wg genkey | tee /home/ubuntu/wg-keys/server-priv | wg pubkey > /home/ubuntu/wg-keys/server-pub
+  shell: set -o pipefail && wg genkey | tee /home/ubuntu/wg-keys/server-priv | wg pubkey > /home/ubuntu/wg-keys/server-pub
   args:
     creates: /home/ubuntu/wg-keys/server-priv
 
 - name: Generate a pair of client keys with WG (we can always generate more later for other clients)
-  shell: wg genkey | tee /home/ubuntu/wg-keys/client-priv | wg pubkey > /home/ubuntu/wg-keys/client-pub
+  shell: set -o pipefail && wg genkey | tee /home/ubuntu/wg-keys/client-priv | wg pubkey > /home/ubuntu/wg-keys/client-pub
   args:
     creates: /home/ubuntu/wg-keys/client-priv
 
