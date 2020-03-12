@@ -13,7 +13,7 @@
   delegate_to: localhost
 
 - name: Generate WG client QR locally
-  shell: qrencode --read ~/wg-config/wg0.conf --output ~/wg-config/wg0.png
+  command: qrencode --read ~/wg-config/wg0.conf --output ~/wg-config/wg0.png
   args:
     creates: ~/wg-config/wg0.png
   delegate_to: localhost
