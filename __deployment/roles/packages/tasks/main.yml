@@ -25,6 +25,6 @@
   become: yes
   apt:
     name: wireguard
-    state: latest
+    state: present
     update_cache: yes
 ...

@@ -14,7 +14,7 @@
     name:
       - docker
       - docker-compose
-    state: latest
+    state: present
 
 ### CONFIG SYSTEM DNS
 - name: Edit resolved.conf to disable the systemd-resolved stub resolver
