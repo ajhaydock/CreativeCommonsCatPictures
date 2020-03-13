@@ -14,6 +14,31 @@ buildx:
     - git clone git://github.com/docker/buildx ./docker-buildx
     - docker build --platform=local -o . ./docker-buildx
 
+ansible-lint:
+  image: python:3
+  stage: test
+  script:
+    - python3 -m pip install ansible-lint
+    - ansible-lint __deployment/playbook.yml
+
+docker-lint:
+  image: projectatomic/dockerfile-lint
+  stage: test
+  script:
+    - dockerfile_lint -f Dockerfile
+
+terraform-lint:
+  image: alpine:latest
+  stage: test
+  script:
+    - apk --no-cache add curl unzip
+    - cd __deployment
+    - curl -L "$(curl -Ls https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_amd64.zip")" -o tflint.zip
+    - unzip tflint.zip
+    - rm tflint.zip
+    - chmod +x tflint
+    - ./tflint
+
 build:
   image: docker:stable
   stage: build
