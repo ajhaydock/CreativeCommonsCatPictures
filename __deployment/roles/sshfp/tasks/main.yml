@@ -3,6 +3,7 @@
   shell: 'set -o pipefail && ssh-keygen -r {{ wg_hostname }} -f /etc/ssh/ssh_host_ed25519_key.pub | grep -o -E -e "[0-9a-f]{64}"'
   args:
     executable: /bin/bash
+  changed_when: false
   register: sshfp
 
 - name: Set an SSHFP record using the hash we generate above, for {{ wg_hostname }}
