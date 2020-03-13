@@ -1,5 +1,7 @@
 FROM ubuntu:20.04 as builder
 LABEL maintainer "Alex Haydock <alex@alexhaydock.co.uk>"
+LABEL name "DarkwebKittens"
+LABEL version "1.0"
 
 ENV DEBIAN_FRONTEND noninteractive
 
