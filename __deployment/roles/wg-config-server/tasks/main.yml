@@ -8,11 +8,13 @@
   shell: set -o pipefail && wg genkey | tee /home/ubuntu/wg-keys/server-priv | wg pubkey > /home/ubuntu/wg-keys/server-pub
   args:
     creates: /home/ubuntu/wg-keys/server-priv
+    executable: /bin/bash
 
 - name: Generate a pair of client keys with WG (we can always generate more later for other clients)
   shell: set -o pipefail && wg genkey | tee /home/ubuntu/wg-keys/client-priv | wg pubkey > /home/ubuntu/wg-keys/client-pub
   args:
     creates: /home/ubuntu/wg-keys/client-priv
+    executable: /bin/bash
 
 - name: Create directory to hold keys (on local machine)
   file:
