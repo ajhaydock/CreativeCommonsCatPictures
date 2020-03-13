@@ -14,6 +14,7 @@ services:
     networks:
       pihole_net:
         ipv4_address: 10.0.0.2
+        ipv6_address: 2001:3200:3200::20
 
   pihole:
     image: pihole/pihole:latest
@@ -37,7 +38,7 @@ services:
       # We don't want this since cloudflared handles DNSSEC further upstream.
       DNSSEC: 'false'
       DNSMASQ_LISTENING: 'all'
-      IPv6: 'false'
+      IPv6: 'true'
       # The two ENV vars below are needed to stop the WebUI breaking when we use it on a port other than the default (:80)
       VIRTUAL_HOST: '127.0.0.1:3141'
       WEB_PORT: '3141'
@@ -51,6 +52,7 @@ services:
     networks:
       pihole_net:
         ipv4_address: 10.0.0.3
+        ipv6_address: 2001:3200:3200::30
 
   nginx-doh-public:
     image: nginx:stable-alpine
@@ -70,10 +72,12 @@ services:
     networks:
       pihole_net:
         ipv4_address: 10.0.0.4
+        ipv6_address: 2001:3200:3200::40
 
 networks:
   pihole_net:
     driver: bridge
     ipam:
-     config:
-       - subnet: 10.0.0.0/29
+      config:
+        - subnet: 10.0.0.0/24
+        - subnet: 2001:3200:3200::/64
