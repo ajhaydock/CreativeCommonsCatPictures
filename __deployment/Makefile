@@ -13,3 +13,10 @@ plan:
 
 destroy:
 	export TF_VAR_PUBIP="$(shell curl -4 --silent ifconfig.co)/32" && export TF_VAR_SSHKEY="/home/a/.ssh/id_rsa_AWS" && export TF_VAR_SSHPUBKEY="/home/a/.ssh/id_rsa_AWS.pub" && terraform destroy
+
+test:
+	docker run --rm -v $(pwd):/data -t wata727/tflint
+
+ssh:
+    # Here we specify our local private key, forward the Pi-Hole port and also verify our SSHFP fingerprint
+	ssh ubuntu@wg.darkwebkittens.xyz -i ~/.ssh/id_rsa_AWS -L 3141:127.0.0.1:3141 -o VerifyHostKeyDNS=true

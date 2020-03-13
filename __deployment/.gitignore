@@ -1,0 +1,10 @@
+# Terraform module directory
+.terraform/
+
+# Terraform state
+*.tfstate
+*.tfstate.backup
+*.lock.info
+
+# Files fetched from remote hosts
+fetched/

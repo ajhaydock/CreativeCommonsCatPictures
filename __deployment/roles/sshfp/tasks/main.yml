@@ -1,0 +1,17 @@
+---
+- name: Generate SSHFP record from our ed25519 key and grep for the SHA256 string this command produces
+  shell: 'set -o pipefail && ssh-keygen -r {{ wg_hostname }} -f /etc/ssh/ssh_host_ed25519_key.pub | grep -o -E -e "[0-9a-f]{64}"'
+  args:
+    executable: /bin/bash
+  register: sshfp
+
+- name: Set an SSHFP record using the hash we generate above, for {{ wg_hostname }}
+  cloudflare_dns:
+    zone: darkwebkittens.xyz
+    record: wg
+    type: SSHFP
+    # These refer to an ed25519 key using SHA256 hashing. Find more info: https://unix.stackexchange.com/a/121881
+    algorithm: 4
+    hash_type: 2
+    value: "{{ sshfp.stdout }}"
+...

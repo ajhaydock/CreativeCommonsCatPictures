@@ -1,13 +1,5 @@
 # Jekyll build dir
 _site/
 
-# Terraform module directory
-.terraform/
-
-# Terraform state
-*.tfstate
-*.tfstate.backup
-*.lock.info
-
 # Don't use Gemfile.lock
 Gemfile.lock

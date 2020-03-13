@@ -11,6 +11,7 @@
 
   roles:
     - packages
+    - sshfp
     - wg-config-server
     - wg-config-clients
     - doh-pihole
