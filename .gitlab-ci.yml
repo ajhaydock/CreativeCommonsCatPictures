@@ -8,7 +8,7 @@ ansible-lint:
 
 docker-lint:
   image: projectatomic/dockerfile-lint
-  stage: test
+  stage: .pre
   script:
     - dockerfile_lint -f Dockerfile
 
@@ -44,7 +44,7 @@ buildx:
 # Run build
 build:
   image: docker:stable
-  stage: .pre
+  stage: build
   services:
     - name: docker:stable-dind
       command: ["--experimental"]
