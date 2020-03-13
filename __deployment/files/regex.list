@@ -2,5 +2,6 @@
 (^|\.)crashlytics\.com$
 (^|\.)dailymail\.co\.uk$
 (^|\.)express\.co\.uk$
+(^|\.)onion$
 (^|\.)thesun\.co\.uk$
 (^|\.)ttoc8ok\.com$
