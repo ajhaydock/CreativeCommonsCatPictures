@@ -15,8 +15,9 @@ This repo is the culmination of experimentation with lots of different tools and
 * **Jekyll / Ruby** - For building the static site.
 * **Tor Onion Services** - For hosting the 'Darkweb' portion of this project.
 * **Docker** - Site container.
-* **GitLab CI** - Automated container builds and testing.
+* **GitLab CI** - Automated container builds and testing, as well as GitOps deployment of Terraform plans via merge requests.
 * **Terraform** - Automated infrastructure deployment.
+* **Terraform Cloud** - Central storage of Terraform State.
 * **Ansible** - Configuration management of deployed infrastructure.
 * **AWS EC2** - My current platform for testing infrastructure automation.
 * **AWS Security Groups** - Amazon's cloud firewall.

@@ -1,0 +1,116 @@
+# Based on:
+# https://gitlab.com/gitops-demo/infra/templates/-/raw/master/terraform.gitlab-ci.yml
+
+image:
+  name: hashicorp/terraform:light
+  entrypoint:
+    - '/usr/bin/env'
+    - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+
+# Default output file for Terraform plan
+variables:
+  PLAN: plan.tfplan
+  TF_IN_AUTOMATION: "true"
+
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - .terraform
+
+before_script:
+  - rm -rf .terraform
+  - terraform --version
+  # Insert the value of $TFCLOUD_API_KEY (set in GitLab CI settings) into our backend.tf file.
+  # When set in GitLab's CI settings, this var should not be "Protected", or it will only be
+  # visible to protected branches.
+  - sed -i "s/CHANGEME/$TFCLOUD_API_KEY/g" backend.tf
+  - terraform init
+
+stages:
+  - validate
+  - plan
+  - apply
+  - destroy
+
+# This will run on pushes to branches
+validate:
+  stage: validate
+  script:
+    - terraform validate
+    - terraform fmt -check=true # Run just "terraform fmt" loally before updating the repo to format your .tf files
+  only:
+    - branches
+
+# This will run once we've generated a merge request for the branch we pushed to.
+# It runs "terraform plan" and then comments some relevant info on our merge request comments thread.
+# We can then see it fail, or choose to merge into master and trigger the next stage (apply).
+merge review:
+  stage: plan
+  script:
+    - terraform plan -out=$PLAN # THIS BREAKS - Fix? https://github.com/hashicorp/terraform/issues/22779#issuecomment-532742758
+    - echo \`\`\`diff > plan.txt
+    - terraform show -no-color ${PLAN} | tee -a plan.txt
+    - echo \`\`\` >> plan.txt
+    - sed -i -e 's/  +/+/g' plan.txt
+    - sed -i -e 's/  ~/~/g' plan.txt
+    - sed -i -e 's/  -/-/g' plan.txt
+    - apk --no-cache add curl
+    - MESSAGE=$(cat plan.txt)
+    - >-
+      curl -X POST -g -H "PRIVATE-TOKEN: ${GITLAB_TOKEN}" 
+      --data-urlencode "body=${MESSAGE}" 
+      "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/merge_requests/${CI_MERGE_REQUEST_IID}/discussions"
+  artifacts:
+    name: plan
+    paths:
+      - $PLAN
+  only:
+    - merge_requests
+
+# This will run to generate a plan once we've approved and merged the pull request into master
+# IMPORTANT: Don't allow directly committing to master!
+plan production:
+  stage: plan
+  script:
+    - terraform plan -out=$PLAN
+  artifacts:
+    name: plan
+    paths:
+      - $PLAN
+  only:
+    - master
+
+# This will apply the plan and build the actual infra, only on the master branch
+apply:
+  stage: apply
+  script:
+    # We need to add Ansible as we use it as a provisioner
+    - apk --no-cache add ansible
+    - chmod 0700 "id_rsa_AWS" # make sure permissions on SSH key aren't too open or Ansible complains
+    - terraform apply -input=false $PLAN
+  dependencies:
+    - plan production
+  artifacts:
+    name: $CI_COMMIT_REF_SLUG
+    untracked: true
+  only:
+    - master
+
+# This runs only when we manually use the GitLab UI to start the pipeline on the master branch
+#
+# If the apply step above fails badly and we're left with a half-deployed infrastructure, we
+# need to take some manual steps to destroy it so we can try again.
+#
+# Download the state file from Terraform Cloud and save it as `terraform.tfstate`, and then run
+# (locally):
+#     terraform destroy -lock=false
+#
+# Because we're using a "Local" execution mode with Terraform Cloud, it won't delete any infra
+# for us. It expects us to do that locally. Which is not ideal.
+destroy:
+  stage: destroy
+  script:
+    - terraform destroy -auto-approve
+  when: manual
+  only:
+    - master

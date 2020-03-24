@@ -5,12 +5,12 @@ variable "cloudflare_zone_id" {
 
 // create A record for server
 resource "cloudflare_record" "A" {
-  zone_id  = var.cloudflare_zone_id
-  name     = "wg"
-  type     = "A"
-  ttl      = 600
-  proxied  = false
-  value    = aws_instance.dwk.public_ip
+  zone_id = var.cloudflare_zone_id
+  name    = "wg"
+  type    = "A"
+  ttl     = 600
+  proxied = false
+  value   = aws_instance.dwk.public_ip
 }
 
 // Can't get AAAA records to work until I can work out how to extract the IPv4 address from the Terraform vars
