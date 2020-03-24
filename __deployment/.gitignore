@@ -1,3 +1,6 @@
+# Terraform CLI config
+.terraformrc
+
 # Terraform module directory
 .terraform/
 

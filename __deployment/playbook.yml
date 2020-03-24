@@ -15,6 +15,6 @@
     - wg-config-server
     - wg-config-clients
     - doh-pihole
-    - dwk-onion
+#   - dwk-onion
     - debug
 ...

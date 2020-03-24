@@ -1,20 +1,13 @@
 ---
-- name: Generate WG client config in ~/wg-config/wg0.conf
+- name: Generate WG client config in ./wg-config/wg0.conf
   template:
     src: wg0-client.conf
-    dest: ~/wg-config/wg0.conf
+    dest: ./wg-config/wg0.conf
   delegate_to: localhost
 
-  #TODO: Make local-OS agnostic
-- name: Generate WG client QR
-  apt:
-    name: qrencode
-    state: present
-  delegate_to: localhost
-
-- name: Generate WG client QR locally
-  command: qrencode --read ~/wg-config/wg0.conf --output ~/wg-config/wg0.png
-  args:
-    creates: ~/wg-config/wg0.png
-  delegate_to: localhost
+#- name: Generate WG client QR locally
+#  command: qrencode --read ./wg-config/wg0.conf --output ./wg-config/wg0.png
+#  args:
+#    creates: ./wg-config/wg0.png
+#  delegate_to: localhost
 ...

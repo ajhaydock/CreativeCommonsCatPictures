@@ -14,5 +14,7 @@
     # These refer to an ed25519 key using SHA256 hashing. Find more info: https://unix.stackexchange.com/a/121881
     algorithm: 4
     hash_type: 2
+    account_email: "{{ lookup('env','CLOUDFLARE_EMAIL') }}"
+    account_api_token: "{{ lookup('env','CLOUDFLARE_API_KEY') }}"
     value: "{{ sshfp.stdout }}"
 ...

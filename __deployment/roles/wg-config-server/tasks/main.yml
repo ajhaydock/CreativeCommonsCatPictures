@@ -18,14 +18,14 @@
 
 - name: Create directory to hold keys (on local machine)
   file:
-    path: ~/wg-config
+    path: ./wg-config
     state: directory
   delegate_to: localhost
 
 - name: Copy generated server keys to local machine
   fetch:
     src: "/home/ubuntu/wg-keys/{{ item }}"
-    dest: "~/wg-config/{{ item }}"
+    dest: "./wg-config/{{ item }}"
     flat: yes
   with_items:
     - server-priv
